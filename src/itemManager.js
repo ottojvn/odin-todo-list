@@ -45,11 +45,11 @@ class ItemManager {
   }
 
   set filterDone(filter) {
-    this.filterDone = filter;
+    this.FilterDone = filter;
   }
 
   get filterDone() {
-    return this.filterDone;
+    return this.FilterDone;
   }
 
   get items() {
