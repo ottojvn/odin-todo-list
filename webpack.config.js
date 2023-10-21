@@ -1,23 +1,62 @@
-import { fileURLToPath } from 'url';
-import { resolve, dirname } from 'path';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
+const webpack = require('webpack');
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-export default {
-  devServer: {
-    static: './dist',
+const config = {
+  entry: './src/index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js'
   },
-  devtool: 'inline-source-map',
-  entry: {
-    index: './src/index.js',
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
+      },
+      {
+        test: /\.js$/,
+        use: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.png$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              mimetype: 'image/png'
+            }
+          }
+        ]
+      },
+      {
+        test: /\.svg$/,
+        use: 'file-loader'
+      }
+    ]
   },
-  mode: 'development',
+  plugins: [
+    new HtmlWebpackPlugin({
+      templateContent: ({ htmlWebpackPlugin }) => '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>' + htmlWebpackPlugin.options.title + '</title></head><body><div id=\"app\"></div></body></html>',
+      filename: 'index.html',
+    })
+  ],
   optimization: {
     runtimeChunk: 'single',
-  },
-  output: {
-    clean: true,
-    filename: '[name].bundle.js',
-    path: resolve(dirname(fileURLToPath(import.meta.url)), 'dist'),
-  },
-  plugins: [new HtmlWebpackPlugin({ title: 'Todo List' })],
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  }
 };
+
+module.exports = config;
